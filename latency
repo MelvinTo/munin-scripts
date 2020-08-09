@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "graph_category network"
+echo "graph_title latency"
+#echo "graph_args --base 1000 -l 0"
+echo "graph_vlabel ms"
+echo "graph_scale no"
+echo "graph_info Latency to servers"
+
+## set hostnames to test latency here
+declare -a servers=("hostname")
+
+# chmod on ping if getting error "ping: socket: Operation not permitted"
+# chmod 4755 /bin/ping
+
+for i in "${servers[@]}"; do
+   name="${i//./_}"
+   echo "$name.label $i"
+   echo "$name.type GAUGE"
+   echo "$name.draw LINE1"
+   echo "$name.value $(ping -W 4 -c 4 $i | tail -n 1 | awk -F/ '{print $5}' | awk -F. '{print $1}')"
+done
+
